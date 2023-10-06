@@ -3,6 +3,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { WebSocketProvider } from '@/context/websocketContext'
+import Footer from '@/components/Footer/Footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,6 +23,7 @@ export default function RootLayout({
         <WebSocketProvider>
           <Header />
           {children}
+          <Footer />
         </WebSocketProvider>
       </body>
     </html>

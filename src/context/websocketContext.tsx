@@ -4,11 +4,7 @@ import React, { createContext, useContext, useEffect } from 'react';
 import WebSocketClient from '@/api/websocketClient'; // 如果路径不同，请相应调整
 
 interface WebSocketContextType {
-  send: (data: OutgoingMessage) => void;
-}
-interface OutgoingMessage {
-  type: string;
-  [key: string]: any;
+  send: (eventType: string, eventData: any) => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -32,8 +28,15 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     };
   }, []);
 
+  const send = (eventType: string, eventData: any) => {
+    WebSocketClient.send({
+      type: eventType,
+      data: eventData
+    });
+  };
+
   return (
-    <WebSocketContext.Provider value={{ send: WebSocketClient.send }}>
+    <WebSocketContext.Provider value={{ send }}>
       {children}
     </WebSocketContext.Provider>
   );

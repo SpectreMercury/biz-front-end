@@ -1,17 +1,27 @@
 'use client'
-
 import React, { useState } from "react";
 import { Menu } from "@headlessui/react";
 import Link from "next/link";
-import Logo from '../../assets/img/logo.png'
-import Image from "next/image";
+import Image from 'next/image'
+
 const Header = () => {
   const commonClasses = "px-4 py-2 text-sm border rounded-full border-primary text-primary hover:bg-primary hover:text-white transition";
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
 
-  const connectWallet = () => {
-    // 这里添加钱包连接逻辑
-    setWalletAddress("0x1234567890abcdef1234567890abcdef12345678");
+  const connectWallet = async () => {
+    if (typeof ethereum !== 'undefined') {
+        try {
+            // 请求用户授权
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            // accounts数组中的第一个是当前选择的地址
+            const userAddress = accounts[0];
+            setWalletAddress(userAddress);
+        } catch (error) {
+            console.error("User denied account access");
+        }
+    } else {
+        console.error("Ethereum object doesn't exist!");
+    }
   };
 
   const disconnectWallet = () => {
@@ -28,10 +38,26 @@ const Header = () => {
   return (
     <header className="w-screen p-4 flex justify-between items-center text-textPrimary border-b border-border">
       <div className="flex items-center space-x-2">
-        <Image src={Logo} alt="Logo" className="h-8 w-auto" />
-        {/*<span className="text-lg font-semibold">Logo Text</span>*/}
+        <Link href={'/Home'}>
+          <Image src={'/assets/svg/logo.svg'} alt={'logo'} width={150} height={28} />
+        </Link>
+        <div className="flex !ml-8 gap-8">
+          <Link className="text-base font-semibold text-textPrimary hover:text-primary transition" href="/square">
+            Square
+          </Link>
+          <Link className="text-base font-semibold text-textPrimary hover:text-primary transition" href="/partners">
+            Partners
+          </Link>
+        </div>
       </div>
       <div>
+        {walletAddress && (
+          <Link href={'/PostRequirements'}>
+            <button className="px-4 py-2 mr-4 text-sm border rounded-full border-primary bg-primary text-white hover:bg-white hover:text-primary transition">
+              Post Needs
+            </button>
+          </Link>
+        )}
         {walletAddress ? (
           <Menu as="div" className="relative inline-block text-left">
             <div>
