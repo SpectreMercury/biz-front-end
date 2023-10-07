@@ -29,10 +29,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
   }, []);
 
   const send = (eventType: string, eventData: any) => {
-    WebSocketClient.send({
-      type: eventType,
-      data: eventData
-    });
+    WebSocketClient.send([eventType, eventData]);
   };
 
   return (

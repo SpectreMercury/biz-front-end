@@ -30,7 +30,7 @@ class WebSocketClient {
     rws.addEventListener('open', () => {
       console.log('WebSocket connected');
       this.pendingAcks.forEach((messageId) => {
-        this.send({ type: 'retry', messageId });
+        this.send(['retry', messageId ]);
       });
     });
 
@@ -54,9 +54,8 @@ class WebSocketClient {
     return rws;
   }
 
-  public send(data: OutgoingMessage): void {
+  public send(data: Array<any>): void {
     const messageId = this.generateMessageId();
-    data.messageId = messageId;
     this.pendingAcks.add(messageId); // 添加消息ID到待确认集合中
     this.socket.send(JSON.stringify(data));
   }
