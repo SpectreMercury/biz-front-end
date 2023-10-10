@@ -3,10 +3,15 @@ import React, { useState } from "react";
 import { Menu } from "@headlessui/react";
 import Link from "next/link";
 import Image from 'next/image'
+import { useDispatch, useSelector } from 'react-redux';
+import { setAddress } from '@/store/walletSlice';
+import { RootState } from '@/store/store';
 
 const Header = () => {
   const commonClasses = "px-4 py-2 text-sm border rounded-full border-primary text-primary hover:bg-primary hover:text-white transition";
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const dispatch = useDispatch();
+  const walletAddress = useSelector((state: RootState) => state.wallet.address);
+
 
   const connectWallet = async () => {
     if (typeof ethereum !== 'undefined') {
@@ -15,7 +20,7 @@ const Header = () => {
             const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
             // accounts数组中的第一个是当前选择的地址
             const userAddress = accounts[0];
-            setWalletAddress(userAddress);
+            dispatch(setAddress(userAddress));
         } catch (error) {
             console.error("User denied account access");
         }
@@ -25,7 +30,7 @@ const Header = () => {
   };
 
   const disconnectWallet = () => {
-    setWalletAddress(null);
+    dispatch(setAddress(null));
   };
 
   const shortAddress = (address: string | null) => {

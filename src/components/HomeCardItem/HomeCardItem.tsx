@@ -6,11 +6,10 @@ interface CardProps {
     avatarSrc: string;
     projectName: string;
     projectDescription: string;
-    date: Date;
 }
 
-const HomeCardItem: React.FC<CardProps> = ({ avatarSrc, projectName, projectDescription, date }) => {
-    const formattedDate = `${date.getDate()}${['th', 'st', 'nd', 'rd'][((date.getDate() + 90) % 100 - 10) % 10] || 'th'} ${date.toLocaleString('default', { month: 'short' })}, ${date.getFullYear()}`;
+const HomeCardItem: React.FC<CardProps> = ({ avatarSrc, projectName, projectDescription }) => {
+    // const formattedDate = `${date.getDate()}${['th', 'st', 'nd', 'rd'][((date.getDate() + 90) % 100 - 10) % 10] || 'th'} ${date.toLocaleString('default', { month: 'short' })}, ${date.getFullYear()}`;
 
     return (
         <div className="p-[24px]">
@@ -29,7 +28,7 @@ const HomeCardItem: React.FC<CardProps> = ({ avatarSrc, projectName, projectDesc
                 <div className="flex items-center px-3 py-1 bg-[#F5FAFF] text-textPrimary rounded">
                     <span>Tag</span>
                 </div>
-                <span className='text-textSecondary text-sm'>{formattedDate}</span>
+                {/* <span className='text-textSecondary text-sm'>{formattedDate}</span> */}
             </div>
 
             {/* Third Row */}

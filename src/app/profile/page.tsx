@@ -10,14 +10,14 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 interface ProfileData {
   name: string;
-  projectDescription: string;
+  about: string;
   avatarUrl: string;
 }
 
 const Profile: React.FC = () => {
   const [profile, setProfile] = useState<ProfileData>({
     name: 'John Doe',
-    projectDescription: 'Hello, I am John.',
+    about: 'Hello, I am John.',
     avatarUrl: '/assets/img/avatar-demo.png'
   });
   const [isEditing, setIsEditing] = useState(false);
@@ -91,8 +91,11 @@ const Profile: React.FC = () => {
 
   const handleConfirm = async () => {
     if(isEditing) { 
-      console.log(profile)
-      let metadata = await createMetadataEvent(walletAddress || "", profile);
+      const finalFormData = {
+        ...profile,
+        role: "organization"
+      };
+      let metadata = await createMetadataEvent(walletAddress || "", finalFormData);
       if (send) {
         send('EVENT', metadata);
       }
@@ -151,14 +154,14 @@ const Profile: React.FC = () => {
         <div className="mb-4">
           {isEditing ? (
             <textarea
-              name="projectDescription"
-              value={profile.projectDescription}
+              name="about"
+              value={profile.about}
               onChange={handleInputChange}
               rows={6}
               className="w-full border p-2"
             ></textarea>
           ) : (
-            <p className="text-sm text-textPrimary">{profile.projectDescription}</p>
+            <p className="text-sm text-textPrimary">{profile.about}</p>
           )}
         </div>
 

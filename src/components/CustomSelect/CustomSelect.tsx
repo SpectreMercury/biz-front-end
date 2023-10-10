@@ -29,7 +29,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, onOptionSelected, 
         </span>
       </div>
       {isOpen && (
-        <div className="absolute w-full mt-2 border border-gray-300 rounded-md shadow-md z-10">
+        <div className="absolute bg-white w-full mt-2 border border-gray-300 rounded-md shadow-md z-10">
           {options.map(option => (
             <div key={option} className="p-2 hover:bg-gray-200 cursor-pointer" onClick={() => handleOptionClick(option)}>
               {option}
