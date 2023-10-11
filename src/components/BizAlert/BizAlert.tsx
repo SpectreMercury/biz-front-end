@@ -20,7 +20,7 @@ const GlobalAlert: React.FC<GlobalAlertProps> = ({ message, type }) => {
       <div className={`w-[640px] ${bgColor} text-white font-bold rounded-t px-4 py-2`}>
         {type === 'success' ? 'Success' : 'Error'}
       </div>
-      <div className={`w-[640px] border border-t-0 ${borderColor} rounded-b px-4 py-3 ${textColor}`}>
+      <div className={`w-[640px] border bg-white z-10 border-t-0 ${borderColor} rounded-b px-4 py-3 ${textColor}`}>
         <ul>
           {message.map((msg, index) => (
             <li key={index}>• {msg}</li>
