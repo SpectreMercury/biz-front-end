@@ -24,6 +24,7 @@ interface EventType {
     kind: number;
     content: FormData;
     sig?: string; 
+    tags: Array<any>
 }
 
 function PostRequirements() {
@@ -73,7 +74,6 @@ function PostRequirements() {
 
     const finalFormData = {
       ...formData,
-      tags: []
     };
 
     const json = JSON.stringify([0, ethereum.selectedAddress, Date.now(), 1, finalFormData]);
@@ -84,6 +84,7 @@ function PostRequirements() {
       "created_at": Math.floor(Date.now() / 1000),
       "kind": 1,
       "content": finalFormData,
+      "tags": []
     }
     const sig = await ethereum.request({
       method: "personal_sign",

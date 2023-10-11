@@ -3,16 +3,20 @@
 import { useState } from 'react';
 import BackgroundAnimation from '../BackgroundCanvas/BackgroundCanvas';
 import { Post } from '@/api/requests'
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+
 
 function PreRelease() {
     const [email, setEmail] = useState('');
+    const walletAddress = useSelector((state: RootState) => state.wallet.address);
 
     const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
         Post({
-            url: '/user/email/registration', // 注意这里的URL变化
+            url: 'http://124.223.105.57:8883/user/email/registration', 
             data: {
               email: email,
-              walletAddress: "123@qq.com"
+              walletAddress: walletAddress
             }
         });
     };

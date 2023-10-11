@@ -43,26 +43,26 @@ const Header = () => {
   return (
     <header className="w-screen p-4 flex justify-between items-center text-textPrimary border-b border-border">
       <div className="flex items-center space-x-2">
-        <Link href={'/Home'}>
+        <Link href={'/'}>
           <Image src={'/assets/svg/logo.svg'} alt={'logo'} width={150} height={28} />
         </Link>
-        <div className="flex !ml-8 gap-8">
+        {/* <div className="flex !ml-8 gap-8">
           <Link className="text-base font-semibold text-textPrimary hover:text-primary transition" href="/square">
             Square
           </Link>
           <Link className="text-base font-semibold text-textPrimary hover:text-primary transition" href="/partners">
             Partners
           </Link>
-        </div>
+        </div> */}
       </div>
       <div>
-        {walletAddress && (
+        {/* {walletAddress && (
           <Link href={'/PostRequirements'}>
             <button className="px-4 py-2 mr-4 text-sm border rounded-full border-primary bg-primary text-white hover:bg-white hover:text-primary transition">
               Post Needs
             </button>
           </Link>
-        )}
+        )} */}
         {walletAddress ? (
           <Menu as="div" className="relative inline-block text-left">
             <div>
@@ -71,15 +71,15 @@ const Header = () => {
               </Menu.Button>
             </div>
 
-            <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
               <div className="py-1">
-                <Menu.Item>
+                {/* <Menu.Item>
                   {({ active }) => (
-                      <Link href="/profile" className={`block px-4 py-2 text-sm  ${active ? "bg-gray-100 text-gray-900" : "text-gray-700"}`}>
+                      <Link href="/profile" className={`block px-4 py-2 text-sm  ${active ? "bg-gray-100 text-gray-900" : "text-gray-700"} hover:cursor-default`}>
                         Profile
                       </Link>
                   )}
-                </Menu.Item>
+                </Menu.Item> */}
                 <Menu.Item>
                   {({ active }) => (
                     <div
