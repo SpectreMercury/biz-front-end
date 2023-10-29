@@ -3,16 +3,104 @@
 import { useState, useEffect } from 'react';
 import { Tab } from '@headlessui/react';
 import Image from 'next/image';
-import { useWebSocket } from '@/context/websocketContext';
-import createMetadataEvent from '@/lib/sig_metamask';
+import { Language, Twitter } from '@material-ui/icons';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import Joined from '@/components/Requirements/Joined/Joined';
+import Owned from '@/components/Requirements/Owned/Owned';
+import ProductRegistration from '@/components/Registeration/Registeration';
 
 interface ProfileData {
   name: string;
   about: string;
   avatarUrl: string;
 }
+
+
+const mockJoinedData = [
+  {
+    logoSrc: "/path/to/logo.jpg",
+    projectName: "Sample Project Accepted",
+    tag: "Tech",
+    time: "2023-10-01",
+    title: "Sample Title for Accepted",
+    introduction: "This is a brief introduction about the project...",
+    cooperationLogos: ["/path/to/logo1.jpg", "/path/to/logo2.jpg"],
+    application: {
+      avatarSrc: "/path/to/avatar.jpg",
+      applicantName: "John Doe",
+      applicationTime: "2023-10-01",
+      status: "accepted",
+      applicationNote: "Looking forward to this collaboration!",
+      replyNote: "Sure, let's get started!",
+      replyTime: "2023-10-02",
+    },
+  },
+  {
+    logoSrc: "/path/to/logo.jpg",
+    projectName: "Sample Project Rejected",
+    tag: "Tech",
+    time: "2023-10-01",
+    title: "Sample Title for Rejected",
+    introduction: "This is a brief introduction about the project...",
+    cooperationLogos: ["/path/to/logo1.jpg", "/path/to/logo2.jpg"],
+    application: {
+      avatarSrc: "/path/to/avatar.jpg",
+      applicantName: "Jane Smith",
+      applicationTime: "2023-10-01",
+      status: "rejected",
+      applicationNote: "Hope to collaborate on this!",
+      replyNote: "Sorry, we are looking for a different skill set.",
+      replyTime: "2023-10-02",
+    },
+  },
+  {
+    logoSrc: "/path/to/logo.jpg",
+    projectName: "Sample Project Pending",
+    tag: "Tech",
+    time: "2023-10-01",
+    title: "Sample Title for Pending",
+    introduction: "This is a brief introduction about the project...",
+    cooperationLogos: ["/path/to/logo1.jpg", "/path/to/logo2.jpg"],
+    application: {
+      avatarSrc: "/path/to/avatar.jpg",
+      applicantName: "Alice Johnson",
+      applicationTime: "2023-10-01",
+      status: "pending",
+      applicationNote: "I believe I'm a great fit for this project!",
+      // 注意：由于状态是 pending，所以可能没有回复或回复时间
+    },
+  },
+];
+
+const mockOwnedData = {
+  tag: "Business",
+  time: "2023-10-01",
+  status: "ongoing",
+  bonus: "$1000",
+  title: "Sample Title for Owned",
+  description: "This is a detailed description about the project...",
+  cooperationAvatars: ["/path/to/avatar1.jpg", "/path/to/avatar2.jpg"],
+  applications: [
+    {
+      avatar: "/path/to/applicant1.jpg",
+      name: "Applicant 1",
+      remark: "I'm interested in this project.",
+      reply: "Let's discuss further.",
+      time: "2023-10-01",
+      status: "accepted",
+      cooperationCompleted: true,
+    },
+    {
+      avatar: "/path/to/applicant2.jpg",
+      name: "Applicant 2",
+      remark: "Can I join?",
+      time: "2023-10-02",
+      status: "pending",
+    },
+  ],
+};
+
 
 const Profile: React.FC = () => {
   const [profile, setProfile] = useState<ProfileData>({
@@ -22,7 +110,7 @@ const Profile: React.FC = () => {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [walletAddress, setWalletAddress] = useState("")
-  const { send } = useWebSocket()
+  const [currentView, setCurrentView] = useState<'partners' | 'published' | 'applied' | 'register'>('published');
   const router = useRouter(); 
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -32,6 +120,14 @@ const Profile: React.FC = () => {
     const { name, value } = e.target;
     setProfile(prev => ({ ...prev, [name as keyof ProfileData]: value }));
   };
+
+  const isOwner = () => {
+    if (checkWalletAddress) {
+      return checkWalletAddress === walletAddress;
+    }
+    return true; // 如果没有checkWalletAddress，那么默认是自己的页面
+  };
+
 
   const getWalletAddress = async (): Promise<string | null> => {
       if (typeof ethereum !== 'undefined') {
@@ -88,27 +184,14 @@ const Profile: React.FC = () => {
           fetchProfileData();
       }
   }, [walletAddress])
-
-  const handleConfirm = async () => {
-    if(isEditing) { 
-      const finalFormData = {
-        ...profile,
-        role: "organization"
-      };
-      let metadata = await createMetadataEvent(walletAddress || "", finalFormData);
-      if (send) {
-        send('EVENT', metadata);
-      }
-    } 
-    setIsEditing(!isEditing)
-  };
+  
   
   return (
     <div className="flex">
       {/* Left Side */}
-      <div className="w-1/4 p-6">
+      <div className="w-1/5 p-6 border border-grey-100 rounded-lg self-start mt-4 ml-4">
         {/* Avatar & Message */}
-        <div className="flex items-center justify-between mb-4 ">
+        <div className="flex items-center justify-between mb-4">
           <div className="relative rounded-full overflow-hidden hover:cursor-pointer">
             <img src="/assets/img/avatar-demo.png" alt="User Avatar" className="w-36 h-36 rounded-full" />
             {isEditing && (
@@ -142,7 +225,6 @@ const Profile: React.FC = () => {
           )}
           {!checkWalletAddress && (
             <button
-              onClick={handleConfirm}
               className="ml-2 border rounded-md pt-1 pb-1 pl-3 pr-3"
             >
               {isEditing ? 'Save' : 'Edit'}
@@ -168,45 +250,72 @@ const Profile: React.FC = () => {
         {/* Social Icons */}
         <div className="flex space-x-4 mb-4"> 
           {/* Add your social icons here */}
-        </div>
-
-        {/* Builders */}
-        <div className="opacity-0">
-          <h3 className="mb-4">Builders</h3>
-          <div className="flex space-x-4">
-            {/* Add your builder icons here */}
+          <div className="bg-gray-100 rounded p-1 hover:cursor-default">
+            <Language/>
+          </div>
+          <div className="bg-gray-100 rounded p-1 hover:cursor-default">
+            <Twitter />
           </div>
         </div>
 
-        {/* Projects */}
-        <div className="opacity-0">
-          <h3 className="mb-4">Projects</h3>
-          <div className="flex space-x-4">
-            {/* Add your project logos here */}
-          </div>
+        <div className="flex flex-col gap-2 justify-start">
+          {isOwner() ? (
+            <>
+              <button className={`text-xs ${currentView == 'published' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}>我发布的合作需求</button>
+              <button className={`text-xs ${currentView == 'applied' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}>我申请的合作需求</button>
+              <button className={`text-xs ${currentView == 'partners' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}>我的合作伙伴</button>
+            </>
+          ) : (
+            <>
+              <button className={`text-xs ${currentView == 'published' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}>Ta 发布的合作需求</button>
+              <button className={`text-xs ${currentView == 'applied' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}>Ta参与的合作需求</button>
+              <button className={`text-xs ${currentView == 'partners' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}>Ta的合作伙伴</button>
+            </>
+          )}
         </div>
       </div>
 
       {/* Right Side */}
-      <div className="w-3/4 p-4">
-        <Tab.Group>
-            <Tab.List className="flex mb-4">
-            <Tab as="button" className={({ selected }) => selected ? 'border-b-2 border-primary px-4 py-2' : 'px-4 py-2'}>
-                Table View
-            </Tab>
-            <Tab as="button" className={({ selected }) => selected ? 'border-b-2 border-primary px-4 py-2' : 'px-4 py-2'}>
-                Network View
-            </Tab>
-            </Tab.List>
-            <Tab.Panels>
-            <Tab.Panel>
-                {/* Table View Content */}
-            </Tab.Panel>
-            <Tab.Panel>
-                {/* Network View Content */}
-            </Tab.Panel>
-            </Tab.Panels>
-        </Tab.Group>
+      <div className="w-4/5 p-4">
+        {currentView === 'partners' && (
+          <Tab.Group>
+              <Tab.List className="flex mb-4">
+              <Tab as="button" className={({ selected }) => selected ? 'border-b-2 border-primary px-4 py-2' : 'px-4 py-2'}>
+                  Table View
+              </Tab>
+              <Tab as="button" className={({ selected }) => selected ? 'border-b-2 border-primary px-4 py-2' : 'px-4 py-2'}>
+                  Network View
+              </Tab>
+              </Tab.List>
+              <Tab.Panels>
+              <Tab.Panel>
+                  {/* Table View Content */}
+              </Tab.Panel>
+              <Tab.Panel>
+                  {/* Network View Content */}
+              </Tab.Panel>
+              </Tab.Panels>
+          </Tab.Group>
+        )}
+
+        {currentView === 'published' && 
+          <div className='flex flex-col gap-4'>
+            {
+              mockJoinedData.map((data, index) => (
+                <Joined key={index} {...data} />
+              ))
+            }
+          </div>
+        }
+
+        {currentView === 'applied' && (
+          <Owned {...mockOwnedData} />
+        )}
+
+        {currentView === 'register' && (
+          <ProductRegistration />
+        )}
+        
       </div>
     </div>
   );

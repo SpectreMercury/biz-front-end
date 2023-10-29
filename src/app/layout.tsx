@@ -4,7 +4,6 @@ import Header from '@/components/Header/Header'
 import './globals.css'
 // import { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { WebSocketProvider } from '@/context/websocketContext'
 import Footer from '@/components/Footer/Footer'
 import { Provider } from 'react-redux';
 import store from '@/store/store';
@@ -29,11 +28,9 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Provider store={store}>
-          <WebSocketProvider>
             <Header />
             {children}
             <Footer />
-        </WebSocketProvider>
         </Provider>
       </body>
     </html>

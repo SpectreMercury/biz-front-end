@@ -41,7 +41,7 @@ const Header = () => {
   };
 
   return (
-    <header className="w-screen p-4 flex justify-between items-center text-textPrimary border-b border-border">
+    <header className="p-4 flex justify-between items-center text-textPrimary border-b border-border">
       <div className="flex items-center space-x-2">
         <Link href={'/'}>
           <Image src={'/assets/svg/logo.svg'} alt={'logo'} width={150} height={28} />
@@ -73,13 +73,13 @@ const Header = () => {
 
             <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
               <div className="py-1">
-                {/* <Menu.Item>
+                <Menu.Item>
                   {({ active }) => (
                       <Link href="/profile" className={`block px-4 py-2 text-sm  ${active ? "bg-gray-100 text-gray-900" : "text-gray-700"} hover:cursor-default`}>
                         Profile
                       </Link>
                   )}
-                </Menu.Item> */}
+                </Menu.Item>
                 <Menu.Item>
                   {({ active }) => (
                     <div

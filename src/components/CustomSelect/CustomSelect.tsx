@@ -19,8 +19,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, onOptionSelected, 
   };
 
   return (
-    <div className={`relative ${className}`}>
-      <div className="w-full p-2 border border-gray-300 rounded-md cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+    <div className={`relative ${className} text-sm`}>
+      <div className="w-full p-2 cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
         {selectedOption}
         <span className="absolute right-2 top-1/2 transform -translate-y-1/2">
           <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
