@@ -49,7 +49,15 @@ const RequirementSquare: React.FC = () => {
 
         {/* Content Components */}
         {[1, 2, 3].map((item) => (
-          <PublicRequirements key={item} />
+          <PublicRequirements 
+            key={item}
+            projectName="Sample Project"
+            reward={1000}
+            tags={['Tech', 'React']}
+            date="2023-10-01"
+            title="Sample Title"
+            description="This is a detailed description about the project..."
+          />
         ))}
       </div>
     </div>
