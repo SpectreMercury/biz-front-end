@@ -127,9 +127,18 @@ const Profile: React.FC = () => {
         <div className="flex flex-col gap-2 justify-start">
           {isOwner() ? (
             <>
-              <button className={`text-xs ${currentView == 'published' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}>我发布的合作需求</button>
-              <button className={`text-xs ${currentView == 'applied' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}>我申请的合作需求</button>
-              <button className={`text-xs ${currentView == 'partners' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}>我的合作伙伴</button>
+              <button 
+                className={`text-xs ${currentView == 'published' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}
+                onClick={() => setCurrentView('published')}
+                >我发布的合作需求</button>
+              <button 
+                className={`text-xs ${currentView == 'applied' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}
+                onClick={() => setCurrentView('applied')}
+              >我申请的合作需求</button>
+              <button 
+                className={`text-xs ${currentView == 'partners' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}
+                onClick={() => setCurrentView('partners')}
+              >我的合作伙伴</button>
             </>
           ) : (
             <>
