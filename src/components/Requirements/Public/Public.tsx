@@ -1,16 +1,8 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
+import { PublicRequirements } from '@/interface/requirements'
 
-interface RequirementProps {
-  projectName: string;
-  reward: number;
-  tags: string[];
-  date: string;
-  title: string;
-  description: string;
-}
-
-const PublicRequirements: React.FC<RequirementProps> = ({ projectName, reward, tags, date, title, description }) => {
+const PublicRequirements: React.FC<PublicRequirements> = ({ avatar, organizationName, reward, projectTag, createTime, needsName, description }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
@@ -27,17 +19,15 @@ const PublicRequirements: React.FC<RequirementProps> = ({ projectName, reward, t
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className='rounded-full bg-purple-100 w-10 h-10'></div>
-          <span className='text-textSecondary font-bold'>{projectName}</span>
+          <span className='text-textSecondary font-bold'>{organizationName}</span>
         </div>
         <span className="px-2 py-1 bg-purple-100 text-primary rounded text-sm">${reward}</span>
       </div>
       <div className="flex items-center gap-2">
-        {tags.map((tag, index) => (
-          <span key={index} className="bg-purple-100 text-purple-500 p-1 rounded text-xs">{tag}</span>
-        ))}
-        <span className='text-xs text-textSecondary'>{date}</span>
+        <span className="bg-purple-100 text-purple-500 p-1 rounded text-xs">{projectTag}</span>
+        <span className='text-xs text-textSecondary'>{createTime}</span>
       </div>
-      <h2 className="text-xl font-bold mb-2">{title}</h2>
+      <h2 className="text-xl font-bold mb-2">{needsName}</h2>
       <p className={`text-sm text-textSecondary ${isExpanded ? '' : 'line-clamp-2'}`} ref={descriptionRef}>
         {description}
         {isOverflowing && (isExpanded ? (

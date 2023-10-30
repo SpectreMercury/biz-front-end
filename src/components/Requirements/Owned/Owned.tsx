@@ -1,32 +1,12 @@
+import { OwnedProps } from '@/interface/requirements';
 import React, { useState } from 'react';
 
-interface Application {
-  avatar: string;
-  name: string;
-  remark: string;
-  reply?: string;
-  time: string;
-  status: string;
-  cooperationCompleted?: boolean;
-}
-
-interface OwnedProps {
-  tag: string;
-  time: string;
-  status: string;
-  bonus: string;
-  title: string;
-  description: string;
-  cooperationAvatars: string[];
-  applications: Application[];
-}
-
 const Owned: React.FC<OwnedProps> = ({
-  tag,
+  needsTag,
   time,
   status,
-  bonus,
-  title,
+  reward,
+  needsName,
   description,
   cooperationAvatars,
   applications,
@@ -41,14 +21,14 @@ const Owned: React.FC<OwnedProps> = ({
       <div className="p-4 border rounded-md flex flex-col gap-4">
       <div className="flex justify-between items-center">
         <div className="flex space-x-2 items-center">
-          <span className="bg-purple-100 text-sm text-primary p-1 rounded">{tag}</span>
+          <span className="bg-purple-100 text-sm text-primary p-1 rounded">{needsTag}</span>
           <span className='text-sm text-textSecondary'>{time}</span>
           <span className={`text-${status === 'ongoing' ? 'green' : status === 'ended' ? 'gray' : 'red'}-500 text-sm`}>{status}</span>
         </div>
-        <span className="bg-purple-100 text-sm text-primary py-1 px-2 font-bold rounded">{bonus}</span>
+        <span className="bg-purple-100 text-sm text-primary py-1 px-2 font-bold rounded">{reward}</span>
       </div>
 
-      <h2 className="text-xl font-bold mt-2">{title}</h2>
+      <h2 className="text-xl font-bold mt-2">{needsName}</h2>
 
       <p className={`text-sm text-textSecondary ${isDescriptionExpanded ? '' : 'line-clamp-2'}`}>
         {description}
@@ -59,15 +39,16 @@ const Owned: React.FC<OwnedProps> = ({
         </span>
       </p>
 
-      <div className="mt-4 border rounded-lg border-gray-100 p-4">
-        <h3>已达成合作意向</h3>
-        <div className="flex items-center mt-2 gap-2">
-          {cooperationAvatars.map((avatar, index) => (
-            <div className='bg-primary w-12 h-12 rounded-full'></div>
-            // <img key={index} src={avatar} alt="Avatar" className="w-10 h-10 rounded-full" />
-          ))}
+      {cooperationAvatars && cooperationAvatars.length > 0 && (
+        <div className="mt-4 border rounded-lg border-gray-100 p-4">
+          <h3>已达成合作意向</h3>
+          <div className="flex items-center mt-2 gap-2">
+            {cooperationAvatars.map((avatar, index) => (
+              <img key={index} src={avatar} alt="Avatar" className="w-10 h-10 rounded-full" />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
       {
         !isApplicationsExpanded && (
           <div className="mt-2">
@@ -87,7 +68,7 @@ const Owned: React.FC<OwnedProps> = ({
                     <div className="flex items-center">
                       <div className='bg-primary w-12 h-12 rounded-full'></div>
                       {/* <img src={application.avatar} alt="Application Avatar" className="w-8 h-8 rounded-full" /> */}
-                      <span className="ml-2">{application.name}</span>
+                      <span className="ml-2">{application.organizationName}</span>
                     </div>
                     <div>
                       {application.status === 'pending' && (
@@ -100,9 +81,17 @@ const Owned: React.FC<OwnedProps> = ({
                       {application.status === 'rejected' && <span className="text-purple-500">已拒绝申请</span>}
                     </div>
                   </div>
-                  <p className="mt-2 text-sm text-textSecondary"><span className='font-bold text-black'>申请备注：</span>{application.remark}</p>
-                  {application.reply && <p className="mt-2 text-sm text-textSecondary"><span className='font-bold text-black'>申请回复：</span>{application.reply}</p>}
-                  <p className="mt-2 text-sm text-textSecondary">{application.time}</p>
+                  {application.messageList.map((message, index) => (
+                    <div key={index}>
+                      <p className="mt-2 text-sm text-textSecondary">
+                        <span className='font-bold text-black'>{message.name}：</span>
+                        {message.message}
+                      </p>
+                      <p className="mt-2 text-sm text-textSecondary">
+                        {new Date(message.createTime).toLocaleDateString()} {/* 这里将时间戳转换为日期 */}
+                      </p>
+                    </div>
+                  ))}
                 </div>
                 {application.cooperationCompleted && (
                   <div className="mt-4 mb-4 text-sm">

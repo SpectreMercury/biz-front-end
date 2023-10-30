@@ -1,12 +1,30 @@
 'use client'
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PublicRequirements from '@/components/Requirements/Public/Public';
 import { SearchOutlined } from '@material-ui/icons';
 import CustomSelect from '@/components/CustomSelect/CustomSelect';
+import { PublicNeedRequest } from '@/interface/requirements';
+import { getPublicNeeds } from '@/api/requirements';
+import Link from 'next/link';
 
 const mockFilters = ['Filter 1', 'Filter 2', 'Filter 3'];
 
 const RequirementSquare: React.FC = () => {
+
+  const [publicNeedsData, setPublicNeedsData] = useState<PublicNeedRequest[]>([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getPublicNeeds();
+        setPublicNeedsData(data);
+      } catch (error) {
+        console.error('Failed to fetch public needs:', error);
+      }
+    }
+    fetchData();
+  }, []);
+
   return (
     <div className="flex">
       {/* Left Side - Filters */}
@@ -36,7 +54,6 @@ const RequirementSquare: React.FC = () => {
                     options={['Red', 'Blue', 'Green']}
                     onOptionSelected={(selected, name) => {
                         console.log(`Selected option: ${selected} for ${name}`);
-                        // 这里你可以处理选择的逻辑
                     }}
                     defaultDisplay="所有"
                     name="color"
@@ -44,21 +61,22 @@ const RequirementSquare: React.FC = () => {
                 />
             </div>
           </div>
-          <button className="bg-primary rounded-full text-sm font-bold text-white px-4 py-2 roundeSearchOutlinedd">Release Requirements</button>
+          <Link href="/PostRequirements" className="bg-primary rounded-full text-sm font-bold text-white px-4 py-2 roundeSearchOutlinedd">Release Requirements</Link>
         </div>
 
         {/* Content Components */}
-        {[1, 2, 3].map((item) => (
+        {publicNeedsData.map((item) => (
           <PublicRequirements 
-            key={item}
-            projectName="Sample Project"
-            reward={1000}
-            tags={['Tech', 'React']}
-            date="2023-10-01"
-            title="Sample Title"
-            description="This is a detailed description about the project..."
+            key={item.needsName}
+            avatar={item.avatar}
+            organizationName={item.organizationName}
+            reward={item.reward}
+            projectTag={item.projectTag}
+            createTime={item.createTime}
+            needsName={item.needsName}
+            description={item.description}
           />
-        ))}
+      ))}
       </div>
     </div>
   );

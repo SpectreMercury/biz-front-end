@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAddress } from '@/store/walletSlice';
+import { RootState } from '@/store/store';
 
 const ProductRegistration: React.FC = () => {
   const [formData, setFormData] = useState({
     logo: null,
-    productName: '',
-    productDescription: '',
+    userName: '',
+    description: '',
     website: '',
     twitter: '',
     other: '',
     checkbox: false,
   });
+  const dispatch = useDispatch();
+  const walletAddress = useSelector((state: RootState) => state.wallet.address);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -39,8 +44,8 @@ const ProductRegistration: React.FC = () => {
         <label className="mb-2 flex items-center text-sm font-bold"><span className='text-red-500'>*</span> 产品/品牌名字</label>
         <input
           type="text"
-          name="productName"
-          value={formData.productName}
+          name="userName"
+          value={formData.userName}
           onChange={handleInputChange}
           className="w-full p-2 rounded-full border"
         />
@@ -49,8 +54,8 @@ const ProductRegistration: React.FC = () => {
       <div className="mb-4">
         <label className="mb-2 flex items-center text-sm font-bold"><span className='text-red-500'>*</span>一句话描述</label>
         <textarea
-          name="productDescription"
-          value={formData.productDescription}
+          name="description"
+          value={formData.description}
           onChange={handleInputChange}
           rows={6}
           className="w-full p-2 rounded border"

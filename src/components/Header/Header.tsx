@@ -42,27 +42,13 @@ const Header = () => {
 
   return (
     <header className="p-4 flex justify-between items-center text-textPrimary border-b border-border">
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-8">
         <Link href={'/'}>
           <Image src={'/assets/svg/logo.svg'} alt={'logo'} width={150} height={28} />
         </Link>
-        {/* <div className="flex !ml-8 gap-8">
-          <Link className="text-base font-semibold text-textPrimary hover:text-primary transition" href="/square">
-            Square
-          </Link>
-          <Link className="text-base font-semibold text-textPrimary hover:text-primary transition" href="/partners">
-            Partners
-          </Link>
-        </div> */}
+        <Link className="font-bold text-textSecondary hover:text-primary" href="/RequirementsSqure">Square</Link>
       </div>
       <div>
-        {/* {walletAddress && (
-          <Link href={'/PostRequirements'}>
-            <button className="px-4 py-2 mr-4 text-sm border rounded-full border-primary bg-primary text-white hover:bg-white hover:text-primary transition">
-              Post Needs
-            </button>
-          </Link>
-        )} */}
         {walletAddress ? (
           <Menu as="div" className="relative inline-block text-left">
             <div>
@@ -82,14 +68,14 @@ const Header = () => {
                 </Menu.Item>
                 <Menu.Item>
                   {({ active }) => (
-                    <div
+                    <span
                       onClick={disconnectWallet}
                       className={`${
                         active ? "bg-gray-100 text-gray-900" : "text-gray-700"
                       } block px-4 py-2 text-sm`}
                     >
                       Disconnect
-                    </div>
+                    </span>
                   )}
                 </Menu.Item>
               </div>
