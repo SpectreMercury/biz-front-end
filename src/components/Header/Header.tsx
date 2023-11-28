@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Menu } from "@headlessui/react";
 import Link from "next/link";
 import Image from 'next/image'
@@ -11,9 +11,12 @@ const Header = () => {
   const commonClasses = "px-4 py-2 text-sm border rounded-full border-primary text-primary hover:bg-primary hover:text-white transition";
   const dispatch = useDispatch();
   const walletAddress = useSelector((state: RootState) => state.wallet.address);
-
+  const [showWalletAddress, setShowWalletAddress] = useState("")
 
   const connectWallet = async () => {
+    if (walletAddress) {
+      
+    }
     if (typeof ethereum !== 'undefined') {
         try {
             // 请求用户授权
@@ -21,6 +24,7 @@ const Header = () => {
             // accounts数组中的第一个是当前选择的地址
             const userAddress = accounts[0];
             dispatch(setAddress(userAddress));
+            shortAddress(userAddress)
         } catch (error) {
             console.error("User denied account access");
         }
@@ -29,13 +33,24 @@ const Header = () => {
     }
   };
 
+
+  useEffect(() => {
+    connectWallet()
+  }, [])
+
+  useEffect(() => {
+    shortAddress(walletAddress)
+  }, [walletAddress])
+
   const disconnectWallet = () => {
+    console.log('a')
+    setShowWalletAddress('');
     dispatch(setAddress(null));
   };
 
   const shortAddress = (address: string | null) => {
     if (address) {
-      return `${address.substring(0, 4)}...${address.substring(address.length - 4)}`;
+      setShowWalletAddress(`${address.substring(0, 4)}...${address.substring(address.length - 4)}`);
     }
     return null;
   };
@@ -48,12 +63,16 @@ const Header = () => {
         </Link>
         <Link className="font-bold text-textSecondary hover:text-primary" href="/RequirementsSqure">Square</Link>
       </div>
-      <div>
-        {walletAddress ? (
+    
+      <div className="flex items-center">
+        {showWalletAddress ? (
+            <Link className="px-4 py-2 mr-4 text-sm border rounded-full border-primary bg-primary text-white hover:bg-white hover:text-primary transition" href={'/PostRequirements'}>Post Needs</Link>
+          ): null}
+        {showWalletAddress ? (
           <Menu as="div" className="relative inline-block text-left">
             <div>
               <Menu.Button className={commonClasses}>
-                {shortAddress(walletAddress)}
+                {showWalletAddress}
               </Menu.Button>
             </div>
 
@@ -68,14 +87,14 @@ const Header = () => {
                 </Menu.Item>
                 <Menu.Item>
                   {({ active }) => (
-                    <span
+                    <div
                       onClick={disconnectWallet}
                       className={`${
                         active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-                      } block px-4 py-2 text-sm`}
+                      } block px-4 py-2 text-sm cursor-pointer`}
                     >
                       Disconnect
-                    </span>
+                    </div>
                   )}
                 </Menu.Item>
               </div>

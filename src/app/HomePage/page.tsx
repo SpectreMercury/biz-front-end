@@ -2,17 +2,16 @@
 
 import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import HomeCardItem from '@/components/HomeCardItem/HomeCardItem';
+import { getOrganizations } from '@/api/organisation';
 
 interface OrganzationListItem {
-    avatarUrl?: string;
-    about: string;
-    name: string;
-    date: string;
+    avatar?: string;
+    userName: string;
 }
 
 const HomePage: React.FC = () => {
     const [searchValue, setSearchValue] = useState<string>('');
-    const [orgData, setOrgData] = useState<Array<OrganzationListItem>>([])
+    const [orgData, setOrgData] = useState([])
     const [originalOrgData, setOriginalOrgData] = useState<Array<OrganzationListItem>>([]);
     const [searchMessage, setSearchMessage] = useState<string | null>(null);
     const searchTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -22,48 +21,9 @@ const HomePage: React.FC = () => {
     }, []);
 
     const fetchOrganizationsData = async () => {
-        const response = await fetch(`https://api.web3bd.network/api/organizations`);
-        const data = await response.json();
-        setOrgData(data.organizations);
-        setOriginalOrgData(data.organizations); // 保存原始数据
+        const response:any= await getOrganizations()
+        setOriginalOrgData(response)
     };
-
-    const handleSearchEnter = async () => {
-        if (searchValue.trim() === '') {
-            setOrgData(originalOrgData); // 如果搜索框为空，恢复原始数据
-            setSearchMessage(null);
-            return;
-        }
-
-        const response = await fetch(`https://api.web3bd.network/api/organizations_search?key=${searchValue}`);
-        const data = await response.json();
-        if (data.organizations && data.organizations.length > 0) {
-            setOrgData(data.organizations);
-            setSearchMessage(null);
-        } else {
-            setSearchMessage(`暂时没有找到和${searchValue}相关的项目哦`);
-        }
-    };
-
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setSearchValue(e.target.value);
-        if (searchTimeout.current) {
-            clearTimeout(searchTimeout.current);
-        }
-
-        if (e.target.value.trim() === '') {
-            setOrgData(originalOrgData); // 如果搜索框为空，恢复原始数据
-            setSearchMessage(null);
-            return; // 如果搜索框为空，不再进行后续的搜索操作
-        }
-
-        searchTimeout.current = setTimeout(() => {
-            handleSearchEnter();
-        }, 500); // 500ms 防抖延迟
-    };
-
-
-    
 
     return (
         <div className="pt-32 flex flex-col items-center space-y-6">
@@ -80,8 +40,8 @@ const HomePage: React.FC = () => {
                 <input
                     type="text"
                     value={searchValue}
-                    onChange={handleInputChange}
-                    onKeyPress={handleSearchEnter}
+                    // onChange={handleInputChange}
+                    // onKeyPress={handleSearchEnter}
                     placeholder="Search..."
                     className="flex-grow outline-none"
                 />
@@ -92,16 +52,16 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* Card List */}
-            <div className="w-[1280px] grid grid-cols-4 gap-3 pb-8">
+            <div className=" grid grid-cols-4 gap-3 pb-8">
                 {orgData.length > 0 ? (
                     orgData.map((data, index) => (
                         <div key={index} className="h-[398px] border rounded-lg">
-                            <HomeCardItem 
+                            {/* <HomeCardItem 
                                 key={index}
-                                avatarSrc={data.avatarUrl ? data.avatarUrl : 'https://i.imgs.ovh/2023/10/06/L3TVU.png'}
+                                avatarSrc={data.avatar ? data.avatarUrl : 'https://i.imgs.ovh/2023/10/06/L3TVU.png'}
                                 projectName={data.name}
                                 projectDescription={data.about}
-                            />
+                            /> */}
                         </div>
                     ))
                 ) : (

@@ -6,6 +6,7 @@ export interface PublicRequirements {
   createTime: string;
   needsName: string;
   description: string;
+  projectId: string;
 }
 
 export interface PublicNeedRequest {
@@ -20,6 +21,7 @@ export interface PublicNeedRequest {
   createTime: string;
   lastModifyTime: string;
   projectStatus: string;
+  projectId: string;
 }
 
 
@@ -33,6 +35,7 @@ export interface OwnedApplication {
   status: string;
   walletAddress: string;
   cooperationCompleted?: boolean;
+  projectId: string;
 }
 
 export interface OwnedProps {
@@ -45,4 +48,21 @@ export interface OwnedProps {
   description: string;
   cooperationAvatars: string[];
   applications: OwnedApplication[];
+  projectId?: string;
+
+}
+
+interface MessageDto {
+    name: string;
+    message: string;
+    createTime: number;
+}
+
+export interface Application {
+    applicationUserName: string;
+    applicationUserAvatar: string;
+    applicationId: string;
+    applicationStatus: number;
+    createTime: number;
+    messageDtoList: MessageDto[];
 }

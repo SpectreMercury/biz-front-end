@@ -51,19 +51,45 @@ const Profile: React.FC = () => {
   };
 
   const fetchRequirementsData = async () => {
-    if(!walletAddress) return
-    try {
-      const owned = await getMyNeeds(walletAddress, 1);
-      const applied = await getMyNeeds(walletAddress, 2);
-      const joined = await getMyNeeds(walletAddress, 3);
+    if (!walletAddress) return;
 
-      setOwnedData(owned);
-      setAppliedData(applied);
-      setJoinedData(joined);
-    } catch (error) {
-      console.error('Failed to fetch my needs:', error);
+    let type;
+    switch (currentView) {
+      case 'partners':
+        type = 1; // Assuming 'partners' corresponds to type 1, adjust as needed
+        break;
+      case 'published':
+        type = 1; // Adjust the type according to your needs
+        break;
+      case 'applied':
+        type = 2; // Adjust the type according to your needs
+        break;
+      // If 'register' view does not correspond to a needs type, you might not need to handle it here
+      default:
+        console.log('Invalid view selected');
+        return;
     }
+
+    try {
+  const needs = await getMyNeeds(walletAddress, type);
+  
+  switch (currentView) {
+
+    case 'published':
+      setOwnedData(needs); // Update state for published view
+      break;
+    case 'applied':
+      setAppliedData(needs); // Update state for applied view
+      break;
+    default:
+      console.log('Invalid view selected');
+      return;
   }
+} catch (error) {
+  console.error(`Failed to fetch needs for view ${currentView}:`, error);
+}
+  };
+
 
   useEffect(() => {
     fetchRequirementsData()

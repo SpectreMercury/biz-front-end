@@ -2,21 +2,37 @@
 
 import React, { useState, ChangeEvent } from 'react';
 import CustomSelect from '@/components/CustomSelect/CustomSelect';
+import { publishNeeds } from '@/api/needs';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 
 function PostRequirements() {
+  const walletAddress = useSelector((state: RootState) => state.wallet.address);
   const [formData, setFormData] = useState({
     title: '',
     type: '',
     description: '',
-    budget: '',
+    reward: '',
     currency: '',
     startTime: '',
-    endTime: ''
+    endTime: '',
+    userWallet: walletAddress
   });
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await publishNeeds(formData);
+      console.log('Response:', response);
+      // 处理成功逻辑（如显示成功消息、重置表单等）
+    } catch (error) {
+      console.error('提交失败:', error);
+      // 处理错误逻辑（如显示错误消息）
+    }
   };
 
   return (
@@ -35,7 +51,7 @@ function PostRequirements() {
         />
 
         <label className="block text-sm font-medium mb-2">类型</label>
-        <CustomSelect 
+        {/* <CustomSelect 
           name="type"
           options={['Option 1', 'Option 2']}
           onOptionSelected={(selected, name) => {
@@ -43,7 +59,7 @@ function PostRequirements() {
           }}
           defaultDisplay="请选择类型"
           className="w-full mb-4"
-        />
+        /> */}
 
         <label className="block text-sm font-medium mb-2">详细描述</label>
         <textarea 
@@ -56,7 +72,7 @@ function PostRequirements() {
         ></textarea>
 
         <label className="block text-lg font-medium mb-2">预算赏金</label>
-         <CustomSelect 
+         {/* <CustomSelect 
             name="type"
             options={['Option 1', 'Option 2']}
             onOptionSelected={(selected, name) => {
@@ -64,18 +80,18 @@ function PostRequirements() {
             }}
             defaultDisplay="请选择类型"
             className="w-full mb-4"
-          />
+          /> */}
         <div className="flex items-center mb-4 bg-gray-100 rounded-full space-x-2">
           <input 
             type="text" 
-            name="budget" 
-            value={formData.budget} 
+            name="reward" 
+            value={formData.reward} 
             onChange={handleInputChange} 
             className="flex-grow p-2"
             placeholder="输入数值"
           />
           <CustomSelect 
-            name="currency"
+            name="crypto"
             options={['USD', 'EUR']}
             onOptionSelected={(selected, name) => {
               setFormData(prev => ({ ...prev, [name]: selected }));
@@ -116,7 +132,7 @@ function PostRequirements() {
           </div>
         </div>
 
-        <button className="w-full py-2 text-white bg-primary rounded-full">提交</button>
+        <button className="w-full py-2 text-white bg-primary rounded-full" onClick={handleSubmit}>提交</button>
       </div>
     </div>
   );

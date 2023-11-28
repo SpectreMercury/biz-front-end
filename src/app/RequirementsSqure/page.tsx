@@ -75,6 +75,7 @@ const RequirementSquare: React.FC = () => {
             createTime={item.createTime}
             needsName={item.needsName}
             description={item.description}
+            projectId={item.projectId}
           />
       ))}
       </div>

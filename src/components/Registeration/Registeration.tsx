@@ -1,20 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAddress } from '@/store/walletSlice';
 import { RootState } from '@/store/store';
+import { postRegistration } from '@/api/regiteration';
+import { Uploader3 } from '@lxdao/uploader3';
+import { createConnector } from '@lxdao/uploader3-connector';
+import type { Uploader3Connector } from '@lxdao/uploader3-connector';
+import { CroppedFile, SelectedFile, UploadFile, UploadResult, Uploader3FileStatus} from '@lxdao/uploader3';
+import { Img3 } from '@lxdao/img3';
+import Image from 'next/image';
 
 const ProductRegistration: React.FC = () => {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const dispatch = useDispatch();
+  const walletAddress = useSelector((state: RootState) => state.wallet.address);
   const [formData, setFormData] = useState({
-    logo: null,
+    logo: '',
     userName: '',
     description: '',
     website: '',
     twitter: '',
     other: '',
+    personFlag: false,
+    useEmail: '',
+    userWallet: walletAddress,
     checkbox: false,
   });
-  const dispatch = useDispatch();
-  const walletAddress = useSelector((state: RootState) => state.wallet.address);
+  const connector = React.useRef<null | Uploader3Connector.Connector>(null);
+  const [file, setFile] = React.useState<SelectedFile | UploadFile | UploadResult | CroppedFile | null>();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -22,9 +35,19 @@ const ProductRegistration: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    // Handle form submission logic here
-    console.log(formData);
+    try {
+      let data = postRegistration(formData);
+      console.log(data)
+    } catch (error) {
+      console.log(error)
+    }
   };
+
+  useEffect(() => {
+    connector.current = createConnector('NFT.storage', {
+      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDU5NzQ4ZGQyN0ZmOURmNzVFNDA3NjI5NkU4QzExQkMxNjdkQkE5RjUiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTcwMTA5Mzk4MTA0MSwibmFtZSI6ImJkMyJ9.tiOCtAu0MOfJBL8rbOzRYaFpx5wuBGpnHbo1cgT6gOc',
+    });
+  }, []);
 
   return (
     <div className="p-6 border border-grey-100 rounded-lg flex flex-col gap-4">
@@ -33,10 +56,43 @@ const ProductRegistration: React.FC = () => {
       <div className="">
         <label className="mb-2 flex items-center text-sm font-bold"><span className='text-red-500'>*</span>上传logo</label>
         <div className="flex items-end p-4">
-          <div className="rounded-lg bg-white border border-grey-100 w-16 h-16 flex items-center justify-center">
-            <span>+</span>
-          </div>
-          <span className="ml-4 text-sm">支持svg/jpg/png格式</span>
+          <Uploader3
+            className="!flex items-end "
+            connector={connector.current!}
+            multiple={false}
+            onChange={(files) => {
+              setFile(files[0]);
+            }}
+            onUpload={(file) => {
+              setFile(file);
+            }}
+            onComplete={(file) => {
+              setFile(file);
+              setFormData(prevFormData => {
+              if (file.status === Uploader3FileStatus.done) {
+                return {
+                  ...prevFormData,
+                  logo: file.url,
+                };
+              } else {
+                return prevFormData;
+              }
+            });
+            }}
+            onCropCancel={(file) => {
+              setFile(null);
+            }}
+            onCropEnd={(file) => {
+              setFile(file);
+            }}
+          >
+            <div className="rounded-lg bg-white border border-grey-100 w-16 h-16 flex items-center justify-center">
+              {
+                (formData && formData.logo) ? <Image src={formData.logo} alt={'avatar'} width={40} height={40}></Image> : <span>+</span>
+              }
+            </div>
+            <span className="ml-4 text-sm">支持svg/jpg/png格式</span>
+          </Uploader3>  
         </div>
       </div>
 

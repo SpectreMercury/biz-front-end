@@ -1,5 +1,6 @@
-import { OwnedProps } from '@/interface/requirements';
-import React, { useState } from 'react';
+import { getNeedApplications } from '@/api/requirements';
+import { Application, OwnedProps } from '@/interface/requirements';
+import React, { useEffect, useState } from 'react';
 
 const Owned: React.FC<OwnedProps> = ({
   needsTag,
@@ -9,12 +10,21 @@ const Owned: React.FC<OwnedProps> = ({
   needsName,
   description,
   cooperationAvatars,
-  applications,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDescriptionExpanded, setDescriptionExpanded] = useState(false);
   const [isApplicationsExpanded, setApplicationsExpanded] = useState(false);
+  const [applications, setApplications] = useState<Application[]>([]);
 
+
+  const getApplicationList = async () => {
+    let rlt = await getNeedApplications()
+    setApplications(rlt)
+  }
+
+  useEffect(() => {
+    getApplicationList()
+  }, [])
 
   return (
     <>
@@ -68,20 +78,20 @@ const Owned: React.FC<OwnedProps> = ({
                     <div className="flex items-center">
                       <div className='bg-primary w-12 h-12 rounded-full'></div>
                       {/* <img src={application.avatar} alt="Application Avatar" className="w-8 h-8 rounded-full" /> */}
-                      <span className="ml-2">{application.organizationName}</span>
+                      <span className="ml-2">{application.applicationUserName}</span>
                     </div>
                     <div>
-                      {application.status === 'pending' && (
+                      {application.applicationStatus == 1 && (
                         <>
                           <button className="bg-purple-100 text-primary rounded-full px-3 py-2 mr-2 text-sm font-bold">拒绝</button>
                           <button className="bg-primary text-white rounded-full px-3 py-2 text-sm font-bold">接受</button>
                         </>
                       )}
-                      {application.status === 'accepted' && <span className="text-green-500 text-sm">已接受申请</span>}
-                      {application.status === 'rejected' && <span className="text-purple-500">已拒绝申请</span>}
+                      {application.applicationStatus == 2 && <span className="text-green-500 text-sm">已接受申请</span>}
+                      {application.applicationStatus == 3 && <span className="text-purple-500">已拒绝申请</span>}
                     </div>
                   </div>
-                  {application.messageList.map((message, index) => (
+                  {application.messageDtoList.map((message, index) => (
                     <div key={index}>
                       <p className="mt-2 text-sm text-textSecondary">
                         <span className='font-bold text-black'>{message.name}：</span>
@@ -93,12 +103,12 @@ const Owned: React.FC<OwnedProps> = ({
                     </div>
                   ))}
                 </div>
-                {application.cooperationCompleted && (
+                {application.applicationStatus == 5 && (
                   <div className="mt-4 mb-4 text-sm">
                     对方已确认合作完成
                   </div>
                 )}
-                {application.status === 'accepted' && (
+                {application.applicationStatus === 4 && (
                   <div className="mt-2 flex space-x-2">
                     <button className="bg-primary text-white px-4 py-2 rounded-full text-sm font-bold">确认合作完成</button>
                     <button className="bg-gray-100 px-4 py-2 rounded-full text-sm font-bold">有疑问 ?</button>
