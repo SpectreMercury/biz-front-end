@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Tab } from '@headlessui/react';
 import Image from 'next/image';
 import { Language, Twitter } from '@material-ui/icons';
-import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Joined from '@/components/Requirements/Joined/Joined';
 import Owned from '@/components/Requirements/Owned/Owned';
@@ -14,6 +13,8 @@ import { getMyNeeds } from '@/api/requirements';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAddress } from '@/store/walletSlice';
 import { RootState } from '@/store/store';
+import { getProfile } from '@/api/profile';
+import { FormDataInterface, UserProfile } from '@/interface/profile';
 
 interface ProfileData {
   name: string;
@@ -22,10 +23,10 @@ interface ProfileData {
 }
 
 const Profile: React.FC = () => {
-  const [profile, setProfile] = useState<ProfileData>({
-    name: 'John Doe',
-    about: 'Hello, I am John.',
-    avatarUrl: '/assets/img/avatar-demo.png'
+  const [profile, setProfile] = useState<UserProfile>({
+    userName: 'John Doe',
+    avatar: '/assets/img/avatar-demo.png',
+    userEmail: '',
   });
   const [isEditing, setIsEditing] = useState(false);
   const walletAddress = useSelector((state: RootState) => state.wallet.address);
@@ -42,6 +43,13 @@ const Profile: React.FC = () => {
     const { name, value } = e.target;
     setProfile(prev => ({ ...prev, [name as keyof ProfileData]: value }));
   };
+
+  const getProfileData = async () => {
+    if (walletAddress) {
+      let rlt = await getProfile(walletAddress)
+      setProfile(rlt)
+    }
+  }
 
   const isOwner = () => {
     if (checkWalletAddress) {
@@ -71,29 +79,42 @@ const Profile: React.FC = () => {
     }
 
     try {
-  const needs = await getMyNeeds(walletAddress, type);
-  
-  switch (currentView) {
-
-    case 'published':
-      setOwnedData(needs); // Update state for published view
-      break;
-    case 'applied':
-      setAppliedData(needs); // Update state for applied view
-      break;
-    default:
-      console.log('Invalid view selected');
-      return;
-  }
-} catch (error) {
-  console.error(`Failed to fetch needs for view ${currentView}:`, error);
-}
+      const needs = await getMyNeeds(walletAddress, type);
+      switch (currentView) {
+          case 'published':
+            setOwnedData(needs); // Update state for published view
+            break;
+          case 'applied':
+            setAppliedData(needs); // Update state for applied view
+            break;
+          default:
+            console.log('Invalid view selected');
+            return;
+        }
+      } catch (error) {
+        console.error(`Failed to fetch needs for view ${currentView}:`, error);
+      }
   };
+
+  const handleFormDataChange = (newFormData:FormDataInterface) => {
+    setProfile(prevProfile => ({
+        ...prevProfile,
+        name: newFormData.userName,
+        about: newFormData.description,
+        avatarUrl: newFormData.logo,
+        website: newFormData.website,
+        twitter: newFormData.twitter,
+    }));
+};
 
 
   useEffect(() => {
     fetchRequirementsData()
   }, [currentView])
+
+  useEffect(() => {
+    getProfileData()
+  }, [])
 
   return (
     <div className="flex">
@@ -102,7 +123,7 @@ const Profile: React.FC = () => {
         {/* Avatar & Message */}
         <div className="flex items-center justify-between mb-4">
           <div className="relative rounded-full overflow-hidden hover:cursor-pointer">
-            <img src="/assets/img/avatar-demo.png" alt="User Avatar" className="w-36 h-36 rounded-full" />
+            <Image src={profile.avatar} width={44} height={44} alt={'avatar'} />
            
           </div>
         </div>
@@ -110,7 +131,7 @@ const Profile: React.FC = () => {
         {/* Name */}
         <div className="flex items-center mb-4">
           
-          <span className="flex-grow text-xl">{profile.name}</span>
+          <span className="flex-grow text-xl">{profile.userName}</span>
           {!checkWalletAddress && (
             <button
               className="ml-2 border rounded-md pt-1 pb-1 pl-3 pr-3"
@@ -129,13 +150,13 @@ const Profile: React.FC = () => {
           {isEditing ? (
             <textarea
               name="about"
-              value={profile.about}
+              value={profile.desc}
               onChange={handleInputChange}
               rows={6}
               className="w-full border p-2"
             ></textarea>
           ) : (
-            <p className="text-sm text-textPrimary">{profile.about}</p>
+            <p className="text-sm text-textPrimary">{profile.desc}</p>
           )}
         </div>
 
@@ -231,7 +252,7 @@ const Profile: React.FC = () => {
 
         {currentView === 'register' && 
           <div className='flex flex-col gap-4'>
-            <ProductRegistration />
+            <ProductRegistration onFormDataChange={handleFormDataChange}/>
           </div>
         }
         

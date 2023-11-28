@@ -9,12 +9,19 @@ import type { Uploader3Connector } from '@lxdao/uploader3-connector';
 import { CroppedFile, SelectedFile, UploadFile, UploadResult, Uploader3FileStatus} from '@lxdao/uploader3';
 import { Img3 } from '@lxdao/img3';
 import Image from 'next/image';
+import { FormDataInterface } from '@/interface/profile';
 
-const ProductRegistration: React.FC = () => {
+
+interface ProductRegistrationProps {
+  onFormDataChange: (newFormData: FormDataInterface) => void;
+  // 其他 prop 类型定义（如果有的话）
+}
+
+const ProductRegistration: React.FC<ProductRegistrationProps> = ({ onFormDataChange }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const dispatch = useDispatch();
   const walletAddress = useSelector((state: RootState) => state.wallet.address);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormDataInterface>({
     logo: '',
     userName: '',
     description: '',
@@ -48,6 +55,10 @@ const ProductRegistration: React.FC = () => {
       token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDU5NzQ4ZGQyN0ZmOURmNzVFNDA3NjI5NkU4QzExQkMxNjdkQkE5RjUiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTcwMTA5Mzk4MTA0MSwibmFtZSI6ImJkMyJ9.tiOCtAu0MOfJBL8rbOzRYaFpx5wuBGpnHbo1cgT6gOc',
     });
   }, []);
+
+  useEffect(() => {
+    onFormDataChange(formData);
+}, [formData]);
 
   return (
     <div className="p-6 border border-grey-100 rounded-lg flex flex-col gap-4">

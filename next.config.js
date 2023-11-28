@@ -17,7 +17,7 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ['i.imgs.ovh', 'nftstorage.link'],
+    domains: ['i.imgs.ovh', 'nftstorage.link', 's2.coinmarketcap.com'],
   },
 }
 
