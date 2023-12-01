@@ -7,6 +7,7 @@ import { getOrganizations } from '@/api/organisation';
 interface OrganzationListItem {
     avatar?: string;
     userName: string;
+    desc: string;
 }
 
 const HomePage: React.FC = () => {
@@ -26,7 +27,7 @@ const HomePage: React.FC = () => {
     };
 
     return (
-        <div className="pt-32 flex flex-col items-center space-y-6">
+        <div className="container pt-32 flex flex-col items-center space-y-6">
             {/* Title */}
             <h1 className="text-4xl font-bold">Connect with your partners in Biz</h1>
 
@@ -52,16 +53,16 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* Card List */}
-            <div className=" grid grid-cols-4 gap-3 pb-8">
-                {orgData.length > 0 ? (
-                    orgData.map((data, index) => (
+            <div className="container grid grid-cols-4 gap-3 pb-8 px-[120px]">
+                {originalOrgData.length > 0 ? (
+                    originalOrgData.map((data, index) => (
                         <div key={index} className="h-[398px] border rounded-lg">
-                            {/* <HomeCardItem 
+                            <HomeCardItem 
                                 key={index}
-                                avatarSrc={data.avatar ? data.avatarUrl : 'https://i.imgs.ovh/2023/10/06/L3TVU.png'}
-                                projectName={data.name}
-                                projectDescription={data.about}
-                            /> */}
+                                avatarSrc={data.avatar ? data.avatar : 'https://i.imgs.ovh/2023/10/06/L3TVU.png'}
+                                projectName={data.userName}
+                                projectDescription={data.desc}
+                            />
                         </div>
                     ))
                 ) : (

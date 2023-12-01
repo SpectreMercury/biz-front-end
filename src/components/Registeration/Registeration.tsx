@@ -80,14 +80,15 @@ const ProductRegistration: React.FC<ProductRegistrationProps> = ({ onFormDataCha
             onComplete={(file) => {
               setFile(file);
               setFormData(prevFormData => {
-              if (file.status === Uploader3FileStatus.done) {
-                return {
-                  ...prevFormData,
-                  logo: file.url,
-                };
-              } else {
-                return prevFormData;
-              }
+                if (file.status === Uploader3FileStatus.done) {
+                  console.log(1)
+                  return {
+                    ...prevFormData,
+                    logo: file.url,
+                  };
+                } else {
+                  return prevFormData;
+                }
             });
             }}
             onCropCancel={(file) => {
