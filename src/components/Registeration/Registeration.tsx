@@ -10,6 +10,7 @@ import { CroppedFile, SelectedFile, UploadFile, UploadResult, Uploader3FileStatu
 import { Img3 } from '@lxdao/img3';
 import Image from 'next/image';
 import { FormDataInterface } from '@/interface/profile';
+import { useRouter } from 'next/navigation';
 
 
 interface ProductRegistrationProps {
@@ -33,6 +34,10 @@ const ProductRegistration: React.FC<ProductRegistrationProps> = ({ onFormDataCha
     userWallet: walletAddress,
     checkbox: false,
   });
+  const [alertMessage, setAlertMessage] = useState("")
+  const [alertType, setAlertType] = useState<'error' | 'success' | null>('error');
+  const router = useRouter();
+
   const connector = React.useRef<null | Uploader3Connector.Connector>(null);
   const [file, setFile] = React.useState<SelectedFile | UploadFile | UploadResult | CroppedFile | null>();
 
@@ -44,9 +49,18 @@ const ProductRegistration: React.FC<ProductRegistrationProps> = ({ onFormDataCha
   const handleSubmit = () => {
     try {
       let data = postRegistration(formData);
-      console.log(data)
+      setAlertType('success')
+      setAlertMessage('发布需求成功')
+      setTimeout(() => {
+        router.push('/profile')
+      }, 1000)
     } catch (error) {
-      console.log(error)
+      setAlertType('error')
+       if (error instanceof Error) {
+        setAlertMessage(error.message); // 使用 error.message 而不是整个 error 对象
+      } else {
+        setAlertMessage('发生未知错误');
+      }
     }
   };
 
