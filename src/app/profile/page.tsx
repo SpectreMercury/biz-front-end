@@ -58,6 +58,11 @@ const Profile: React.FC = () => {
     return true; // 如果没有checkWalletAddress，那么默认是自己的页面
   };
 
+  const handleFormDataSubmit = () => {
+    // 资料修改成功后的操作
+    setCurrentView('published');
+  };
+
   const fetchRequirementsData = async () => {
     if (!walletAddress) return;
 
@@ -252,7 +257,8 @@ const Profile: React.FC = () => {
 
         {currentView === 'register' && 
           <div className='flex flex-col gap-4'>
-            <ProductRegistration onFormDataChange={handleFormDataChange}/>
+            <ProductRegistration onFormDataChange={handleFormDataChange}
+              onSubmitSuccess={handleFormDataSubmit}/>
           </div>
         }
         
