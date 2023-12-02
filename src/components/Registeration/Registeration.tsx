@@ -61,6 +61,9 @@ const ProductRegistration: React.FC<ProductRegistrationProps> = ({ onFormDataCha
       } else {
         setAlertMessage('发生未知错误');
       }
+      setTimeout(() => {
+        setAlertMessage("");
+      }, 1000)
     }
   };
 

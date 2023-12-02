@@ -44,6 +44,9 @@ function PostRequirements() {
       } else {
         setAlertMessage('发生未知错误');
       }
+      setTimeout(() => {
+        setAlertMessage("");
+      }, 1000)
     }
   };
 
