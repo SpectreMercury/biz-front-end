@@ -63,7 +63,7 @@ function PostRequirements() {
             name="title" 
             value={formData.title} 
             onChange={handleInputChange} 
-            className="w-full p-2 mb-4 bg-gray-100 text-sm rounded-full"
+            className="w-full p-4 mb-4 bg-gray-100 text-sm rounded-full"
             placeholder="请输入标题"
           />
 
@@ -84,7 +84,7 @@ function PostRequirements() {
             value={formData.description} 
             onChange={handleInputChange} 
             rows={6}
-            className="w-full p-2 mb-4 bg-gray-100 rounded"
+            className="w-full p-4 mb-4 bg-gray-100 rounded"
             placeholder="请输入详细描述"
           ></textarea>
 
@@ -98,22 +98,29 @@ function PostRequirements() {
               defaultDisplay="请选择类型"
               className="w-full mb-4"
             /> */}
-          <div className="flex items-center mb-4 bg-gray-100 rounded-full space-x-2">
+          <div className="flex items-center mb-4 bg-gray-100 border overflow-auto rounded-full space-x-2">
             <input 
               type="text" 
               name="reward" 
               value={formData.reward} 
               onChange={handleInputChange} 
-              className="flex-grow p-2"
+              className="flex-grow px-4 py-2"
               placeholder="输入数值"
             />
             <CustomSelect 
               name="crypto"
-              options={['USD', 'EUR']}
+              options={[{
+                key: '1',
+                value: 'USDT'
+              },{
+                key: '2',
+                value: 'ETH'
+              }
+              ]}
               onOptionSelected={(selected, name) => {
                 setFormData(prev => ({ ...prev, [name]: selected }));
               }}
-              defaultDisplay="Crypto"
+              defaultDisplay="1"
               className="w-32"
             />
           </div>
@@ -122,31 +129,41 @@ function PostRequirements() {
             <label className="block text-sm font-medium mb-2">时间</label>
             <CustomSelect 
               name="type"
-              options={['Option 1', 'Option 2']}
+              options={[{
+                key: '2',
+                value: 'No Time Limition'
+              },{
+                key: '1',
+                value: 'Time Limition'
+              }]}
               onOptionSelected={(selected, name) => {
                 setFormData(prev => ({ ...prev, [name]: selected }));
               }}
               defaultDisplay="请选择类型"
               className="w-full mb-4"
             />
-            <div className="flex flex-col gap-4 items-start bg-gray-100 px-2 py-4 rounded">
-              <div>
-                <label className="block text-xs text-textSecondary">开始时间</label>
-                <div className="flex items-center gap-2">
-                  <input type="date" name="startTime" value={formData.startTime} onChange={handleInputChange} className="mt-2 p-2 text-xs rounded w-52" />
-                  <input type="number" name="startHour" placeholder="时" min="0" max="23" className="mt-2 p-2 text-xs w-16 rounded" />
-                  <input type="number" name="startMinute" placeholder="分" min="0" max="59" className="mt-2 p-2 text-xs w-16 rounded" />
+            {
+              formData.type == '1' && (<>
+                <div className="flex flex-col gap-4 items-start bg-gray-100 px-2 py-4 rounded">
+                  <div>
+                    <label className="block text-xs text-textSecondary">开始时间</label>
+                    <div className="flex items-center gap-2">
+                      <input type="date" name="startTime" value={formData.startTime} onChange={handleInputChange} className="mt-2 p-2 text-xs rounded w-52" />
+                      <input type="number" name="startHour" placeholder="时" min="0" max="23" className="mt-2 p-2 text-xs w-16 rounded" />
+                      <input type="number" name="startMinute" placeholder="分" min="0" max="59" className="mt-2 p-2 text-xs w-16 rounded" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-textSecondary">结束时间</label>
+                    <div className="flex items-center gap-2">
+                      <input type="date" name="endTime" value={formData.endTime} onChange={handleInputChange} className="mt-2 p-2 text-xs rounded w-52" />
+                      <input type="number" name="endHour" placeholder="时" min="0" max="23" className="mt-2 p-2 text-xs w-16 rounded" />
+                      <input type="number" name="endMinute" placeholder="分" min="0" max="59" className="mt-2 p-2 text-xs w-16 rounded" />
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <label className="block text-xs text-textSecondary">结束时间</label>
-                <div className="flex items-center gap-2">
-                  <input type="date" name="endTime" value={formData.endTime} onChange={handleInputChange} className="mt-2 p-2 text-xs rounded w-52" />
-                  <input type="number" name="endHour" placeholder="时" min="0" max="23" className="mt-2 p-2 text-xs w-16 rounded" />
-                  <input type="number" name="endMinute" placeholder="分" min="0" max="59" className="mt-2 p-2 text-xs w-16 rounded" />
-                </div>
-              </div>
-            </div>
+              </>)
+            }
           </div>
 
           <button className="w-full py-2 text-white bg-primary rounded-full" onClick={handleSubmit}>提交</button>

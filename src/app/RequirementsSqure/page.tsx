@@ -26,9 +26,9 @@ const RequirementSquare: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex">
+    <div className="flex justify-center">
       {/* Left Side - Filters */}
-      <div className="w-1/5 m-4 p-4 flex flex-col items-center border border-gray-100 self-start rounded-lg">
+      {/* <div className="w-1/5 m-4 p-4 flex flex-col items-center border border-gray-100 self-start rounded-lg">
         <h2 className="mb-4 font-bold">Filters</h2>
         {mockFilters.map((filter, index) => (
           <div key={index} className="mb-2">
@@ -36,7 +36,7 @@ const RequirementSquare: React.FC = () => {
             <label htmlFor={`filter-${index}`} className="ml-2">{filter}</label>
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Right Side - Content */}
       <div className="w-4/5 p-4">
@@ -49,7 +49,7 @@ const RequirementSquare: React.FC = () => {
                 <input type="text" placeholder="Search..." className="rounded-full p-2 flex-grow" />
                 <button className="h-full bg-primary text-white p-2 rounded-r-full text-sm">Search</button>
             </div>
-            <div>
+            {/* <div>
                 <CustomSelect 
                     options={['Red', 'Blue', 'Green']}
                     onOptionSelected={(selected, name) => {
@@ -59,7 +59,7 @@ const RequirementSquare: React.FC = () => {
                     name="color"
                     className="w-24 border border-gray-100 rounded-full"
                 />
-            </div>
+            </div> */}
           </div>
           <Link href="/PostRequirements" className="bg-primary rounded-full text-sm font-bold text-white px-4 py-2 roundeSearchOutlinedd">Release Requirements</Link>
         </div>

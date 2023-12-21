@@ -1,6 +1,6 @@
 import { getNeedApplications } from '@/api/requirements';
 import { Application, OwnedProps } from '@/interface/requirements';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 const Owned: React.FC<OwnedProps> = ({
   needsTag,
@@ -15,12 +15,25 @@ const Owned: React.FC<OwnedProps> = ({
   const [isDescriptionExpanded, setDescriptionExpanded] = useState(false);
   const [isApplicationsExpanded, setApplicationsExpanded] = useState(false);
   const [applications, setApplications] = useState<Application[]>([]);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
 
 
   const getApplicationList = async () => {
     let rlt = await getNeedApplications()
     setApplications(rlt)
   }
+
+  const isOverflowed = (element: HTMLElement): boolean => {
+    return element.scrollHeight > element.clientHeight;
+  };
+
+  useEffect(() => {
+    if (descriptionRef.current && isOverflowed(descriptionRef.current)) {
+      setDescriptionExpanded(false);
+    } else {
+      setDescriptionExpanded(true);
+    }
+  }, []);
 
   useEffect(() => {
     getApplicationList()
@@ -35,7 +48,7 @@ const Owned: React.FC<OwnedProps> = ({
           <span className='text-sm text-textSecondary'>{time}</span>
           <span className={`text-${status === 'ongoing' ? 'green' : status === 'ended' ? 'gray' : 'red'}-500 text-sm`}>{status}</span>
         </div>
-        <span className="bg-purple-100 text-sm text-primary py-1 px-2 font-bold rounded">{reward}</span>
+        <span className="bg-purple-100 text-sm text-primary py-1 px-2 font-bold rounded">$ {reward}</span>
       </div>
 
       <h2 className="text-xl font-bold mt-2">{needsName}</h2>
@@ -45,7 +58,12 @@ const Owned: React.FC<OwnedProps> = ({
         <span 
           onClick={() => setDescriptionExpanded(!isDescriptionExpanded)} 
           className="text-primary text-sm cursor-pointer">
-          {isDescriptionExpanded ? '收起' : '展开全部'}
+          {descriptionRef.current && isOverflowed(descriptionRef.current) && (
+            <span onClick={() => setDescriptionExpanded(!isDescriptionExpanded)} 
+                  className="text-primary text-sm cursor-pointer">
+              {isDescriptionExpanded ? '收起' : '展开全部'}
+            </span>
+          )}
         </span>
       </p>
 
@@ -62,7 +80,7 @@ const Owned: React.FC<OwnedProps> = ({
       {
         !isApplicationsExpanded && (
           <div className="mt-2">
-            <button onClick={() => setApplicationsExpanded(!isApplicationsExpanded)} className="text-purple-500">展开需求详情</button>
+            <button onClick={() => setApplicationsExpanded(!isApplicationsExpanded)} className="text-purple-500 text-xs">展开需求详情</button>
           </div>
         )
       }
@@ -120,7 +138,7 @@ const Owned: React.FC<OwnedProps> = ({
       )
     }
     {isApplicationsExpanded && (
-      <button onClick={() => setApplicationsExpanded(false)} className="text-purple-500 mt-2">收起</button>
+      <button onClick={() => setApplicationsExpanded(false)} className="text-purple-500 mt-2 text-xs">收起</button>
     )}
     </>
   );
