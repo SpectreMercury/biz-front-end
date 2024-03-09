@@ -3,10 +3,18 @@
 import { useState, useEffect } from 'react';
 import { Tab } from '@headlessui/react';
 import Image from 'next/image';
-import { useWebSocket } from '@/context/websocketContext';
-import createMetadataEvent from '@/lib/sig_metamask';
-import Link from 'next/link';
+import { Language, Twitter } from '@material-ui/icons';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import Joined from '@/components/Requirements/Joined/Joined';
+import Owned from '@/components/Requirements/Owned/Owned';
+import ProductRegistration from '@/components/Registeration/Registeration';
+import { OwnedProps } from '@/interface/requirements';
+import { getMyNeeds } from '@/api/requirements';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAddress } from '@/store/walletSlice';
+import { RootState } from '@/store/store';
+import { getProfile } from '@/api/profile';
+import { FormDataInterface, UserProfile } from '@/interface/profile';
 
 interface ProfileData {
   name: string;
@@ -15,135 +23,127 @@ interface ProfileData {
 }
 
 const Profile: React.FC = () => {
-  const [profile, setProfile] = useState<ProfileData>({
-    name: 'John Doe',
-    about: 'Hello, I am John.',
-    avatarUrl: '/assets/img/avatar-demo.png'
+  const [profile, setProfile] = useState<UserProfile>({
+    userName: 'John Doe',
+    avatar: '/assets/img/avatar-demo.png',
+    userEmail: '',
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [walletAddress, setWalletAddress] = useState("")
-  const { send } = useWebSocket()
+  const walletAddress = useSelector((state: RootState) => state.wallet.address);
+  const [currentView, setCurrentView] = useState<'partners' | 'published' | 'applied' | 'register'>('published');
   const router = useRouter(); 
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const checkWalletAddress = searchParams.get('walletAddress')
+  const [ownedData, setOwnedData] = useState<OwnedProps[]>([]);
+  const [appliedData, setAppliedData] = useState<OwnedProps[]>([]);
+  const [joinedData, setJoinedData] = useState<OwnedProps[]>([]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setProfile(prev => ({ ...prev, [name as keyof ProfileData]: value }));
   };
 
-  const getWalletAddress = async (): Promise<string | null> => {
-      if (typeof ethereum !== 'undefined') {
-          try {
-              const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-              const userAddress = accounts[0];
-              setWalletAddress(userAddress);
-              return userAddress;
-          } catch (error) {
-              console.error("User denied account access");
-              return null;
-          }
-      } else {
-          console.error("Ethereum object doesn't exist!");
-          return null;
-      }
+  const getProfileData = async () => {
+    if (walletAddress) {
+      let rlt = await getProfile(walletAddress)
+      setProfile(rlt)
+    }
   }
 
-  useEffect(() => {
-    const fetchProfileData = async (address: string) => {
-      const response = await fetch(`https://api.web3bd.network/api/profile?addr=${address}`);
-      const data = await response.json();
-      if (!Object.keys(data.data).length) {
-        data.data = {
-          name: 'Biz Nexus 42#',
-          projectDescription: 'Life, Universe and Everything',
-          avatarUrl: '/assets/img/avatar-demo.png'
-        }
-      } 
-      setProfile(data.data);
-    };
-
+  const isOwner = () => {
     if (checkWalletAddress) {
-      fetchProfileData(checkWalletAddress);
-    } else {
-      getWalletAddress().then(address => {
-        if (address) {
-          fetchProfileData(address);
-        }
-      });
+      return checkWalletAddress === walletAddress;
     }
-  }, [checkWalletAddress]);
+    return true; // 如果没有checkWalletAddress，那么默认是自己的页面
+  };
+
+  const handleFormDataSubmit = () => {
+    // 资料修改成功后的操作
+    setCurrentView('published');
+  };
+
+  const fetchRequirementsData = async () => {
+    if (!walletAddress) return;
+
+    let type;
+    switch (currentView) {
+      case 'partners':
+        type = 1; // Assuming 'partners' corresponds to type 1, adjust as needed
+        break;
+      case 'published':
+        type = 1; // Adjust the type according to your needs
+        break;
+      case 'applied':
+        type = 2; // Adjust the type according to your needs
+        break;
+      // If 'register' view does not correspond to a needs type, you might not need to handle it here
+      default:
+        console.log('Invalid view selected');
+        return;
+    }
+
+    try {
+      const needs = await getMyNeeds(walletAddress, type);
+      switch (currentView) {
+          case 'published':
+            setOwnedData(needs); // Update state for published view
+            break;
+          case 'applied':
+            setAppliedData(needs); // Update state for applied view
+            break;
+          default:
+            console.log('Invalid view selected');
+            return;
+        }
+      } catch (error) {
+        console.error(`Failed to fetch needs for view ${currentView}:`, error);
+      }
+  };
+
+  const handleFormDataChange = (newFormData:FormDataInterface) => {
+    setProfile(prevProfile => ({
+        ...prevProfile,
+        name: newFormData.userName,
+        about: newFormData.description,
+        avatarUrl: newFormData.logo,
+        website: newFormData.website,
+        twitter: newFormData.twitter,
+    }));
+};
+
 
   useEffect(() => {
-      const fetchProfileData = async () => {
-          const response = await fetch(`https://api.web3bd.network/api/profile?addr=${walletAddress}`)
-          const data = await response.json();
-          setProfile(data.data)
-      };
+    fetchRequirementsData()
+  }, [currentView])
 
-      if (!walletAddress) {
-          return
-      } else {
-          fetchProfileData();
-      }
-  }, [walletAddress])
+  useEffect(() => {
+    getProfileData()
+  }, [])
 
-  const handleConfirm = async () => {
-    if(isEditing) { 
-      const finalFormData = {
-        ...profile,
-        role: "organization"
-      };
-      let metadata = await createMetadataEvent(walletAddress || "", finalFormData);
-      if (send) {
-        send('EVENT', metadata);
-      }
-    } 
-    setIsEditing(!isEditing)
-  };
-  
   return (
     <div className="flex">
       {/* Left Side */}
-      <div className="w-1/4 p-6">
+      <div className="w-1/5 p-6 border border-grey-100 rounded-lg self-start mt-4 ml-4">
         {/* Avatar & Message */}
-        <div className="flex items-center justify-between mb-4 ">
+        <div className="flex items-center justify-between mb-4">
           <div className="relative rounded-full overflow-hidden hover:cursor-pointer">
-            <img src="/assets/img/avatar-demo.png" alt="User Avatar" className="w-36 h-36 rounded-full" />
-            {isEditing && (
-              <div className="absolute inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
-                更换头像
-              </div>
-            )}
-          </div>
-          <div className="relative ml-4">
-            <Link href={'/ApplicationCentre'}>
-              <Image src={'/assets/svg/message-icon.svg'} alt={'logo'} width={46} height={46} />
-              <span className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-2 py-0.5 text-xs">
-                99+
-              </span>
-            </Link>
+            <Image src={profile.avatar} width={44} height={44} alt={'avatar'} />
+           
           </div>
         </div>
 
         {/* Name */}
         <div className="flex items-center mb-4">
-          {isEditing ? (
-            <input
-              type="text"
-              name="name"
-              value={profile.name}
-              onChange={handleInputChange}
-              className="flex-grow border p-2"
-            />
-          ) : (
-            <span className="flex-grow text-xl">{profile.name}</span>
-          )}
+          
+          <span className="flex-grow text-xl">{profile.userName}</span>
           {!checkWalletAddress && (
             <button
-              onClick={handleConfirm}
               className="ml-2 border rounded-md pt-1 pb-1 pl-3 pr-3"
+              onClick={()=> {
+                console.log(1)
+                setCurrentView('register')
+              }}
             >
               {isEditing ? 'Save' : 'Edit'}
             </button>
@@ -155,58 +155,113 @@ const Profile: React.FC = () => {
           {isEditing ? (
             <textarea
               name="about"
-              value={profile.about}
+              value={profile.desc}
               onChange={handleInputChange}
               rows={6}
               className="w-full border p-2"
             ></textarea>
           ) : (
-            <p className="text-sm text-textPrimary">{profile.about}</p>
+            <p className="text-sm text-textPrimary">{profile.desc}</p>
           )}
         </div>
 
         {/* Social Icons */}
         <div className="flex space-x-4 mb-4"> 
           {/* Add your social icons here */}
-        </div>
-
-        {/* Builders */}
-        <div className="opacity-0">
-          <h3 className="mb-4">Builders</h3>
-          <div className="flex space-x-4">
-            {/* Add your builder icons here */}
+          <div className="bg-gray-100 rounded p-1 hover:cursor-default">
+            <Language/>
+          </div>
+          <div className="bg-gray-100 rounded p-1 hover:cursor-default">
+            <Twitter />
           </div>
         </div>
 
-        {/* Projects */}
-        <div className="opacity-0">
-          <h3 className="mb-4">Projects</h3>
-          <div className="flex space-x-4">
-            {/* Add your project logos here */}
-          </div>
+        <div className="flex flex-col gap-2 justify-start">
+          {isOwner() ? (
+            <>
+              <button 
+                className={`text-xs ${currentView == 'published' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}
+                onClick={() => setCurrentView('published')}
+                >我发布的合作需求</button>
+              <button 
+                className={`text-xs ${currentView == 'applied' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}
+                onClick={() => setCurrentView('applied')}
+              >我申请的合作需求</button>
+              <button 
+                className={`text-xs ${currentView == 'partners' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}
+                onClick={() => setCurrentView('partners')}
+              >我的合作伙伴</button>
+            </>
+          ) : (
+            <>
+              <button className={`text-xs ${currentView == 'published' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}>Ta 发布的合作需求</button>
+              <button className={`text-xs ${currentView == 'applied' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}>Ta参与的合作需求</button>
+              <button className={`text-xs ${currentView == 'partners' ? 'text-primary': 'text-textSecondary'} block w-full text-left`}>Ta的合作伙伴</button>
+            </>
+          )}
         </div>
       </div>
 
       {/* Right Side */}
-      <div className="w-3/4 p-4">
-        <Tab.Group>
-            <Tab.List className="flex mb-4">
-            <Tab as="button" className={({ selected }) => selected ? 'border-b-2 border-primary px-4 py-2' : 'px-4 py-2'}>
-                Table View
-            </Tab>
-            <Tab as="button" className={({ selected }) => selected ? 'border-b-2 border-primary px-4 py-2' : 'px-4 py-2'}>
-                Network View
-            </Tab>
-            </Tab.List>
-            <Tab.Panels>
-            <Tab.Panel>
-                {/* Table View Content */}
-            </Tab.Panel>
-            <Tab.Panel>
-                {/* Network View Content */}
-            </Tab.Panel>
-            </Tab.Panels>
-        </Tab.Group>
+      <div className="w-4/5 p-4">
+        {currentView === 'partners' && (
+          <Tab.Group>
+              <Tab.List className="flex mb-4">
+              <Tab as="button" className={({ selected }) => selected ? 'border-b-2 border-primary px-4 py-2' : 'px-4 py-2'}>
+                  Table View
+              </Tab>
+              <Tab as="button" className={({ selected }) => selected ? 'border-b-2 border-primary px-4 py-2' : 'px-4 py-2'}>
+                  Network View
+              </Tab>
+              </Tab.List>
+              <Tab.Panels>
+              <Tab.Panel>
+                  {/* Table View Content */}
+              </Tab.Panel>
+              <Tab.Panel>
+                  {/* Network View Content */}
+              </Tab.Panel>
+              </Tab.Panels>
+          </Tab.Group>
+        )}
+
+        {/* {currentView === 'published' && 
+          <div className='flex flex-col gap-4'>
+            {
+              ownedData.map((data, index) => (
+                <Joined key={index} {...data} />
+              ))
+            }
+          </div>
+        } */}
+
+        {currentView === 'published' && 
+          <div className='flex flex-col gap-4'>
+            {
+              ownedData.map((data, index) => (
+                <Owned key={index} {...data} />
+              ))
+            }
+          </div>
+        }
+
+        {currentView === 'applied' && 
+          <div className='flex flex-col gap-4'>
+            {
+              appliedData.map((data, index) => (
+                <Owned key={index} {...data} />
+              ))
+            }
+          </div>
+        }
+
+        {currentView === 'register' && 
+          <div className='flex flex-col gap-4'>
+            <ProductRegistration onFormDataChange={handleFormDataChange}
+              onSubmitSuccess={handleFormDataSubmit}/>
+          </div>
+        }
+        
       </div>
     </div>
   );
