@@ -3,6 +3,7 @@
 import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import HomeCardItem from '@/components/HomeCardItem/HomeCardItem';
 import { getOrganizations } from '@/api/organisation';
+import mediaCardData from '@/data/mockData';
 
 interface OrganzationListItem {
     avatar?: string;
@@ -13,18 +14,9 @@ interface OrganzationListItem {
 const HomePage: React.FC = () => {
     const [searchValue, setSearchValue] = useState<string>('');
     const [orgData, setOrgData] = useState([])
-    const [originalOrgData, setOriginalOrgData] = useState<Array<OrganzationListItem>>([]);
+    const [originalOrgData, setOriginalOrgData] = useState<Array<OrganzationListItem>>(mediaCardData);
     const [searchMessage, setSearchMessage] = useState<string | null>(null);
     const searchTimeout = useRef<NodeJS.Timeout | null>(null);
-
-    useEffect(() => {
-        fetchOrganizationsData()
-    }, []);
-
-    const fetchOrganizationsData = async () => {
-        const response:any= await getOrganizations()
-        setOriginalOrgData(response)
-    };
 
     return (
         <div className="container pt-32 flex flex-col items-center space-y-6">
